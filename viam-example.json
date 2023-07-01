@@ -1,0 +1,7 @@
+{
+  "cloud": {
+    "app_address": "https://app.viam.com:443",
+    "id": "<viam-id>",
+    "secret": "<viam-secret>"
+  }
+}
