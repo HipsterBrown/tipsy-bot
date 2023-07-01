@@ -22,4 +22,16 @@ This project assumes some knowledge of git, unix command line basics, [Homebrew]
 
 1. Run the viam-server: `viam-server -config ./viam.json`
 
+1. Rename `.env.example` to `.env` and fill out the environment variables with the expected info, only the `ROBOT_SECRET` and `ROBOT_ADDRESS` are required if following the [tutorial project](https://docs.viam.com/tutorials/projects/tipsy/)
+
 1. In a new terminal session, run `tipsy.py` program: `python tipsy.py`
+
+## Expected functionality
+
+- [ ] Look for people, and move towards them using the camera and a machine learning model
+- [ ] Avoid bumping into obstacles using ultrasonic sensors.  This includes both not starting movement that will create a collision, but also stopping movement when something unexpectedly enters Tipsy’s path
+- [ ] Pauses near people to allow them to choose to grab drinks
+- [ ] Not get “stuck” next to the same person, mingle! (but don’t over-engineer it, randomness is OK, no need to track individual people or where Tipsy has been)
+- [ ] Attempt to not get stuck and/or tipping backwards when impacting an undetected object
+- [ ] Make the number of ultrasonic sensors configurable, e.g. allow one to have a config variable that says it should use X number of ultrasonic sensors
+
