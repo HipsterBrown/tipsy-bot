@@ -28,10 +28,10 @@ This project assumes some knowledge of git, unix command line basics, [Homebrew]
 
 ## Expected functionality
 
-- [ ] Look for people, and move towards them using the camera and a machine learning model
-- [ ] Avoid bumping into obstacles using ultrasonic sensors.  This includes both not starting movement that will create a collision, but also stopping movement when something unexpectedly enters Tipsy’s path
+- [X] Look for people, and move towards them using the camera and a machine learning model
+- [X] Avoid bumping into obstacles using ultrasonic sensors.  This includes both not starting movement that will create a collision, but also stopping movement when something unexpectedly enters Tipsy’s path
 - [ ] Pauses near people to allow them to choose to grab drinks
 - [ ] Not get “stuck” next to the same person, mingle! (but don’t over-engineer it, randomness is OK, no need to track individual people or where Tipsy has been)
 - [ ] Attempt to not get stuck and/or tipping backwards when impacting an undetected object
-- [ ] Make the number of ultrasonic sensors configurable, e.g. allow one to have a config variable that says it should use X number of ultrasonic sensors
+- [X] Make the number of ultrasonic sensors configurable, e.g. allow one to have a config variable that says it should use X number of ultrasonic sensors
 
