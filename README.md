@@ -30,8 +30,23 @@ This project assumes some knowledge of git, unix command line basics, [Homebrew]
 
 - [X] Look for people, and move towards them using the camera and a machine learning model
 - [X] Avoid bumping into obstacles using ultrasonic sensors.  This includes both not starting movement that will create a collision, but also stopping movement when something unexpectedly enters Tipsy’s path
-- [ ] Pauses near people to allow them to choose to grab drinks
-- [ ] Not get “stuck” next to the same person, mingle! (but don’t over-engineer it, randomness is OK, no need to track individual people or where Tipsy has been)
+- [X] Pauses near people to allow them to choose to grab drinks
+- [X] Not get “stuck” next to the same person, mingle! (but don’t over-engineer it, randomness is OK, no need to track individual people or where Tipsy has been)
 - [ ] Attempt to not get stuck and/or tipping backwards when impacting an undetected object
 - [X] Make the number of ultrasonic sensors configurable, e.g. allow one to have a config variable that says it should use X number of ultrasonic sensors
 
+## Diagrams
+
+_[How to read a statechart diagram](https://sceweb.uhcl.edu/helm/RationalUnifiedProcess/process/modguide/md_stadm.htm)_
+
+### Base state machine
+
+![state machine diagram for base movement module](./docs/Tipsy Base States.png)
+
+The ["base" movement module](https://python.viam.dev/autoapi/viam/components/base/index.html#viam.components.base.Base) controls the direction and distance of Tipsy. It consists of the `stopped`, `straight`, and `spinning` states used by the [reference program provided by Viam](https://github.com/viam-labs/devrel-demos/blob/main/tipsy-bot/tipsy.py).
+
+### Base v2 state machine
+
+![improved state machine diagram for base movement module](./docs/Tipsy Base v2 States.png)
+
+This updated machine adds to original design by explicitly transitioning to the `stopped` state when an obstacle is encountered during the `straight` movement action to protect against multiple calls to `stop()` before the person detection loop kicks in again. If an object is detected before attempting to move forward, Tipsy will check if it's a person and wait for them to grab a drink before spinning and running the detection loop again.

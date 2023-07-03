@@ -16,6 +16,7 @@ base_name = os.getenv('ROBOT_BASE') or 'tipsy-base'
 camera_name = os.getenv('ROBOT_CAMERA') or 'cam'
 pause_interval = os.getenv('PAUSE_INTERVAL') or 3
 sensor_count = os.getenv('SENSOR_COUNT') or 2
+drink_grab_wait_time = 30
 
 if isinstance(pause_interval, str):
     pause_interval = int(pause_interval)
@@ -48,15 +49,23 @@ async def gather_obstacle_readings(sensors: List[Sensor]):
 
 async def obstacle_detect_loop(sensors: List[Sensor], base: Base):
     while (True):
-        # reading = await obstacle_detect(sensor)
-        # reading2 = await obstacle_detect(sensor2)
         readings = await gather_obstacle_readings(sensors)
+        global base_state
         if all(reading < 0.4 for reading in readings):
             # stop the base if moving straight
             if base_state == "straight":
                 await base.stop()
+                base_state == "stopped"
                 print("obstacle in front")
         await asyncio.sleep(.01)
+
+
+async def mingle(base: Base):
+    global base_state
+    print("I will turn and look for a person")
+    base_state = "spinning"
+    await base.spin(45, 45)
+    base_state = "stopped"
 
 
 async def person_detect(detector: VisionClient, sensors: List[Sensor], base: Base):
@@ -71,6 +80,7 @@ async def person_detect(detector: VisionClient, sensors: List[Sensor], base: Bas
                 print(d.class_name)
                 if (d.class_name == "Person"):
                     found = True
+                    break
         if (found):
             print("I see a person")
             # first manually call obstacle_detect - don't even start moving if someone is in the way
@@ -80,11 +90,14 @@ async def person_detect(detector: VisionClient, sensors: List[Sensor], base: Bas
                 base_state = "straight"
                 await base.move_straight(distance=800, velocity=250)
                 base_state = "stopped"
+            elif any(classification.class_name == "Person"
+                     async for classification in detector.get_classifications_from_camera(camera_name, 1)
+                     if classification.confidence > .7):
+                print("waiting for person to grab drink")
+                await asyncio.sleep(drink_grab_wait_time)
+                await mingle()
         else:
-            print("I will turn and look for a person")
-            base_state = "spinning"
-            await base.spin(45, 45)
-            base_state = "stopped"
+            await mingle()
 
         await asyncio.sleep(pause_interval)
 
