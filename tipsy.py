@@ -1,7 +1,8 @@
 import asyncio
 import os
-
 from typing import List
+from collections import Counter
+
 from viam.robot.client import RobotClient
 from viam.rpc.dial import Credentials, DialOptions
 from viam.components.sensor import Sensor
@@ -28,6 +29,7 @@ if isinstance(sensor_count, str):
     sensor_count = int(sensor_count)
 
 base_state = "stopped"
+previous_obstacle_readings: List[float] = []
 
 
 async def connect():
@@ -71,11 +73,22 @@ async def mingle(base: Base):
     base_state = "stopped"
 
 
+async def go_around(base: Base):
+    global base_state
+    print("might be stuck, attempting to move away from obstacle")
+    base_state = "stuck"
+    await base.move_straight(distance=-500, velocity=250)
+    await base.spin(45, 45)
+    await base.move_straight(distance=300, velocity=150)
+    await base.spin(-45, 45)
+    base_state = "stopped"
+
+
 async def person_detect(detector: VisionClient, sensors: List[Sensor], base: Base):
     while (True):
         # look for person
         found = False
-        global base_state
+        global base_state, previous_obstacle_readings
         print("will detect")
         detections = await detector.get_detections_from_camera(camera_name)
         for d in detections:
@@ -87,20 +100,26 @@ async def person_detect(detector: VisionClient, sensors: List[Sensor], base: Bas
         if (found):
             print("I see a person")
             # first manually call obstacle_detect - don't even start moving if someone is in the way
+            # also check to make sure Tipsy has been able to move
             distances = await gather_obstacle_readings(sensors)
-            if all(distance > 0.4 for distance in distances):
+            has_moved = Counter(distances) != Counter(
+                previous_obstacle_readings)
+            if all(distance > 0.4 for distance in distances) and has_moved:
+                previous_obstacle_readings = distances
                 print("will move straight")
                 base_state = "straight"
                 await base.move_straight(distance=800, velocity=250)
                 base_state = "stopped"
+            elif not has_moved:
+                await go_around(base)
             elif any(classification.class_name == "Person"
                      async for classification in detector.get_classifications_from_camera(camera_name, 1)
                      if classification.confidence > .7):
                 print("waiting for person to grab drink")
                 await asyncio.sleep(drink_grab_wait_time)
-                await mingle()
+                await mingle(base)
         else:
-            await mingle()
+            await mingle(base)
 
         await asyncio.sleep(pause_interval)
 

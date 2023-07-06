@@ -32,7 +32,7 @@ This project assumes some knowledge of git, unix command line basics, [Homebrew]
 - [X] Avoid bumping into obstacles using ultrasonic sensors.  This includes both not starting movement that will create a collision, but also stopping movement when something unexpectedly enters Tipsy’s path
 - [X] Pauses near people to allow them to choose to grab drinks
 - [X] Not get “stuck” next to the same person, mingle! (but don’t over-engineer it, randomness is OK, no need to track individual people or where Tipsy has been)
-- [ ] Attempt to not get stuck and/or tipping backwards when impacting an undetected object
+- [X] Attempt to not get stuck and/or tipping backwards when impacting an undetected object
 - [X] Make the number of ultrasonic sensors configurable, e.g. allow one to have a config variable that says it should use X number of ultrasonic sensors
 
 ## Diagrams
@@ -49,4 +49,4 @@ The ["base" movement module](https://python.viam.dev/autoapi/viam/components/bas
 
 ![improved state machine diagram for base movement module](./docs/Tipsy Base v2 States.png)
 
-This updated machine adds to original design by explicitly transitioning to the `stopped` state when an obstacle is encountered during the `straight` movement action to protect against multiple calls to `stop()` before the person detection loop kicks in again. If an object is detected before attempting to move forward, Tipsy will check if it's a person and wait for them to grab a drink before spinning and running the detection loop again.
+This updated machine adds to original design by explicitly transitioning to the `stopped` state when an obstacle is encountered during the `straight` movement action to protect against multiple calls to `stop()` before the person detection loop kicks in again. If an object is detected before attempting to move forward, Tipsy will check if it's a person and wait for them to grab a drink before spinning and running the detection loop again. If Tipsy compares the previous obstacle distance data and finds it unchanged from the most recent reading, it will declare itself stuck and attempt to go around an unseen obstacle.
