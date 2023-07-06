@@ -20,11 +20,9 @@ This project assumes some knowledge of git, unix command line basics, [Homebrew]
 
 1. Rename `viam-example.json` to `viam.json` and paste app config in that file
 
-1. Run the viam-server: `viam-server -config ./viam.json`
-
 1. Rename `.env.example` to `.env` and fill out the environment variables with the expected info, only the `ROBOT_SECRET` and `ROBOT_ADDRESS` are required if following the [tutorial project](https://docs.viam.com/tutorials/projects/tipsy/)
 
-1. In a new terminal session, run `tipsy.py` program: `python tipsy.py`
+1. Run the Procfile tasks to start the viam-server and run the `tipsy.py` program (honcho is includd with the `pip install`): `honcho start`
 
 ## Expected functionality
 
